@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "510014991008",
+    "firebase_url": "https://wheresmymoney-63c9c.firebaseio.com",
+    "project_id": "wheresmymoney-63c9c",
+    "storage_bucket": "wheresmymoney-63c9c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:510014991008:android:ba8ae99c50484c42",
+        "android_client_info": {
+          "package_name": "com.example.sharang.wheresmymoney"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "510014991008-8s0rsl6i5q9ckm7uih3oq6bcv4ks2a8e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvfvCogQeTCExhtb5zgrSw9bV_T_VjzZc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

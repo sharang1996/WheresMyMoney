@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="incomeList">
+        <item>Financial Income</item>
+        <item>Gambling</item>
+        <item>Odd jobs</item>
+        <item>Personal Savings</item>
+        <item>Pension</item>
+        <item>Rent</item>
+        <item>Salary</item>
+        <item>Home</item>
+        <item>Debt</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="income_icons">
+        <item>@drawable/fincome</item>
+        <item>@drawable/gambling</item>
+        <item>@drawable/oddjobs</item>
+        <item>@drawable/personal</item>
+        <item>@drawable/pension</item>
+        <item>@drawable/rent</item>
+        <item>@drawable/salary</item>
+        <item>@drawable/home</item>
+        <item>@drawable/debt</item>
+        <item>@drawable/other</item>
+    </string-array>
+
+</resources>
