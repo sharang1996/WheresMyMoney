@@ -88,4 +88,19 @@ public class User {
         if(expenditures==null) expenditures = new ArrayList<>();
         expenditures.add(expenditure);
     }
+
+    public void calculateBalance()
+    {
+        double incomeSum=0,expenditureSum=0;
+        for(Income i:incomes)
+        {
+            incomeSum+=i.getAmount();
+        }
+        for(Expenditure i : expenditures)
+        {
+            expenditureSum+=i.getAmount();
+        }
+
+        setBalance(incomeSum-expenditureSum);
+    }
 }

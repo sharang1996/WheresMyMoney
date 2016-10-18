@@ -5,12 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 public class Splash extends AppCompatActivity {
@@ -21,6 +21,7 @@ public class Splash extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -34,11 +35,9 @@ public class Splash extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
             {
                 final FirebaseUser user = firebaseAuth.getCurrentUser();
-                Log.i("#####"," "+(user==null));
                 if (user != null)
                 {
                     // User is signed in
-                    Log.d("##########", "onAuthStateChanged:signed_in:" + user.getUid());
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -52,7 +51,6 @@ public class Splash extends AppCompatActivity {
                 } else
                 {
                     // User is signed out
-                    Log.d("########", "onAuthStateChanged:signed_out");
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {

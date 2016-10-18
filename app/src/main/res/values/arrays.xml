@@ -26,4 +26,56 @@
         <item>@drawable/other</item>
     </string-array>
 
+    <string-array name="expenditureList">
+        <item>Accomodation</item>
+        <item>Bar</item>
+        <item>Books/Magazines</item>
+        <item>Car</item>
+        <item>Children</item>
+        <item>Cigarettes</item>
+        <item>Clothing</item>
+        <item>Eating Out</item>
+        <item>Entertainment</item>
+        <item>Family</item>
+        <item>Fuel</item>
+        <item>Gambling Losses</item>
+        <item>Gifts</item>
+        <item>Health</item>
+        <item>Home</item>
+        <item>Insurance</item>
+        <item>Pets</item>
+        <item>Rent</item>
+        <item>Shoes</item>
+        <item>Shopping</item>
+        <item>Tax</item>
+        <item>Transport</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="expenditure_icons">
+        <item>@drawable/accomodation</item>
+        <item>@drawable/bar</item>
+        <item>@drawable/book</item>
+        <item>@drawable/car</item>
+        <item>@drawable/children</item>
+        <item>@drawable/cigarettes</item>
+        <item>@drawable/clothing</item>
+        <item>@drawable/eatiingout</item>
+        <item>@drawable/entertainment</item>
+        <item>@drawable/family</item>
+        <item>@drawable/fuel</item>
+        <item>@drawable/gambling</item>
+        <item>@drawable/gifts</item>
+        <item>@drawable/health</item>
+        <item>@drawable/home</item>
+        <item>@drawable/insurance</item>
+        <item>@drawable/pets</item>
+        <item>@drawable/rent</item>
+        <item>@drawable/shoes</item>
+        <item>@drawable/shopping</item>
+        <item>@drawable/tax</item>
+        <item>@drawable/transport</item>
+        <item>@drawable/other</item>
+    </string-array>
+
 </resources>

@@ -40,8 +40,8 @@ public class ExpenditureCategoryActivity extends ListActivity {
 
     private void populateDescriptionList() {
         descriptionList = new ArrayList<>();
-        outcomeDescription = getResources().getStringArray(R.array.incomeList);
-        imgs = getResources().obtainTypedArray(R.array.income_icons);
+        outcomeDescription = getResources().getStringArray(R.array.expenditureList);
+        imgs = getResources().obtainTypedArray(R.array.expenditure_icons);
         for(int i =0;i<outcomeDescription.length;i++)
         {
             descriptionList.add(new ExpenditureCategoryActivity.Description(outcomeDescription[i],imgs.getDrawable(i)));
