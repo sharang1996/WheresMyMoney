@@ -1,11 +1,17 @@
 package com.example.sharang.wheresmymoney;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
+import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -19,12 +25,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.sharang.wheresmymoney.Splash.calledAlready;
 
-public class MainActivity extends AppCompatActivity {
-
+public class Main2Activity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     String uid;
     DatabaseReference rootref;
@@ -33,18 +44,32 @@ public class MainActivity extends AppCompatActivity {
     private Income newIncome;
     private Expenditure newExpenditure;
     TextView tv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main2);
+
+        //Date date = new Date(System.currentTimeMillis());
+        //Log.i("#####",DateFormat.getDateInstance(DateFormat.LONG).format(date));
+
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd kk:mm:ss");
+        Calendar c    = Calendar.getInstance();
+        Date day      = c.getTime();
+        String s2     = df.format(day);
+
+        Log.i("#####",s2);
+
+        if (!calledAlready)
+        {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            calledAlready = true;
+        }
 
         tv = (TextView)findViewById(R.id.textView);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         Intent i = getIntent();
         email = i.getStringExtra("email");
@@ -58,6 +83,15 @@ public class MainActivity extends AppCompatActivity {
                     uid = user.getUid();
                     user.calculateBalance();
                     tv.setText(user.getBalance()+"");
+                    tv.setTextSize(40);
+                    if(user.getBalance()>0)
+                        tv.setTextColor(Color.GREEN);
+                    else
+                    if(user.getBalance()<0)
+                        tv.setTextColor(Color.RED);
+
+
+
                 }
             }
 
@@ -70,9 +104,11 @@ public class MainActivity extends AppCompatActivity {
         final FloatingActionButton fab_main = (FloatingActionButton) findViewById(R.id.fab_main);
         final FloatingActionButton fab_add = (FloatingActionButton) findViewById(R.id.fab_income);
         final FloatingActionButton fab_remove = (FloatingActionButton) findViewById(R.id.fab_expendature);
+
         fab_main.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if(fab_add.getVisibility()==View.INVISIBLE) {
                     fab_add.setVisibility(View.VISIBLE);
                     fab_remove.setVisibility(View.VISIBLE);
@@ -93,6 +129,13 @@ public class MainActivity extends AppCompatActivity {
                 addIncomeDialog();
                 user.calculateBalance();
                 tv.setText(user.getBalance()+"");
+                // TODO: 20/10/16  update the firebase database
+
+                Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
+                Map<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put(uid,usermap);
+
+                rootref.child("user").updateChildren(childUpdates);
             }
         });
 
@@ -102,16 +145,35 @@ public class MainActivity extends AppCompatActivity {
                 addExpenditureDialog();
                 user.calculateBalance();
                 tv.setText(user.getBalance()+"");
+                // TODO: 20/10/16  update the firebase database
+
+                Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
+                Map<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put(uid,usermap);
+
+                rootref.child("user").updateChildren(childUpdates);
             }
         });
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
+
 
     private void addIncomeDialog() {
-        startActivityForResult(new Intent(MainActivity.this,IncomeCategoryActivity.class), 1);
+        startActivityForResult(new Intent(Main2Activity.this,IncomeCategoryActivity.class), 1);
     }
 
+
+
     private void addExpenditureDialog() {
-        startActivityForResult(new Intent(MainActivity.this,ExpenditureCategoryActivity.class), 3);
+        startActivityForResult(new Intent(Main2Activity.this,ExpenditureCategoryActivity.class), 3);
     }
 
     @Override
@@ -124,9 +186,9 @@ public class MainActivity extends AppCompatActivity {
 
             newIncome = new Income(category);
 
-            startActivityForResult(new Intent(MainActivity.this,IncomeDialogActivity.class) , 2);
+            startActivityForResult(new Intent(Main2Activity.this,IncomeDialogActivity.class) , 2);
 
-            Toast.makeText(MainActivity.this,category+" selected",Toast.LENGTH_SHORT).show();
+            Toast.makeText(Main2Activity.this,category+" selected",Toast.LENGTH_SHORT).show();
         }
         if(requestCode == 2 && resultCode == RESULT_OK)
         {
@@ -137,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
             newIncome.setDescription(description);
             newIncome.setAmount(amount);
+            newIncome.setTimestamp(System.currentTimeMillis());
 
             user.addIncome(newIncome);
 
@@ -146,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
             rootref.child("user").updateChildren(childUpdates);
 
-            Toast.makeText(MainActivity.this,description+" " + amount,Toast.LENGTH_SHORT).show();
+            Toast.makeText(Main2Activity.this,description+" " + amount,Toast.LENGTH_SHORT).show();
         }
 
         if(requestCode == 3 && resultCode == RESULT_OK)
@@ -156,9 +219,9 @@ public class MainActivity extends AppCompatActivity {
 
             newExpenditure = new Expenditure(category);
 
-            startActivityForResult(new Intent(MainActivity.this,ExpenditureDialogActivity.class) , 4);
+            startActivityForResult(new Intent(Main2Activity.this,ExpenditureDialogActivity.class) , 4);
 
-            Toast.makeText(MainActivity.this,category+" selected",Toast.LENGTH_SHORT).show();
+            Toast.makeText(Main2Activity.this,category+" selected",Toast.LENGTH_SHORT).show();
         }
 
         if(requestCode == 4 && resultCode == RESULT_OK)
@@ -170,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
 
             newExpenditure.setDescription(description);
             newExpenditure.setAmount(amount);
+            newExpenditure.setTimestamp(System.currentTimeMillis());
 
             user.addExpenditure(newExpenditure);
 
@@ -177,14 +241,24 @@ public class MainActivity extends AppCompatActivity {
             Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put(uid,usermap);
             rootref.child("user").updateChildren(childUpdates);
-            Toast.makeText(MainActivity.this,description+" " + amount,Toast.LENGTH_SHORT).show();
+            Toast.makeText(Main2Activity.this,description+" " + amount,Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.main2, menu);
         return true;
     }
 
@@ -195,12 +269,55 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
             FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(MainActivity.this,SignIn.class));
+            startActivity(new Intent(Main2Activity.this,SignIn.class));
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.history) {
+
+
+            Intent  i = new Intent(Main2Activity.this,History.class);
+
+            Bundle information = new Bundle();
+            information.putSerializable("historyitem", user.getChronologicalEvent());
+            i.putExtras(information);
+
+            startActivity(i);
+            /*for(HistoryItem historyItem : historyItems)
+            {
+             Log.i("blahhh","   "+historyItem.toString());
+            }
+
+              String mDrawableName = "myimageName";
+              int resID = res.getIdentifier(mDrawableName , "drawable", getPackageName());
+              imgView.setImageResource(resID);
+             */
+
+        } else if (id == R.id.nav_max_income) {
+
+        } else if (id == R.id.nav_max_expenditure) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_exit) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
 }

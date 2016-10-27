@@ -17,11 +17,15 @@ public class Splash extends AppCompatActivity {
 
     FirebaseAuth.AuthStateListener mAuthListener;
     FirebaseAuth mAuth;
+    static boolean calledAlready = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        if (!calledAlready)
+        {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            calledAlready = true;
+        }
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -41,7 +45,7 @@ public class Splash extends AppCompatActivity {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            Intent i = new Intent(Splash.this, MainActivity.class);
+                            Intent i = new Intent(Splash.this, Main2Activity.class);
                             i.putExtra("uid",user.getUid());
                             i.putExtra("email",user.getEmail());
                             startActivity(i);

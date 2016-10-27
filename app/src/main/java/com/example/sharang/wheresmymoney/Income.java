@@ -1,5 +1,7 @@
 package com.example.sharang.wheresmymoney;
 
+import java.util.Calendar;
+
 /**
  * Created by sharang on 15/9/16.
  */
@@ -9,6 +11,7 @@ public class Income {
     private double amount;
     private String category;
     private String description;
+    private long timestamp;
 
     public Income()
     {
@@ -19,10 +22,11 @@ public class Income {
         this.category = category;
     }
 
-    public Income(double amount, String category, String description) {
+    public Income(double amount, String category, String description,long timestamp) {
         this.amount = amount;
         this.category = category;
         this.description = description;
+        this.timestamp = timestamp;
     }
 
     public double getAmount() {
@@ -48,4 +52,9 @@ public class Income {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public long getTimestamp() { return timestamp; }
+
+    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+
 }

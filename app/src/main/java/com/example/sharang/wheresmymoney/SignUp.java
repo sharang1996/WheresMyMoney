@@ -20,6 +20,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.sharang.wheresmymoney.Splash.calledAlready;
+
 public class SignUp extends AppCompatActivity {
 
 
@@ -27,13 +29,19 @@ public class SignUp extends AppCompatActivity {
     EditText name,email,password;
     Button submit,signin;
     DatabaseReference rootref;
+    //static boolean calledAlready = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        if (!calledAlready)
+        {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            calledAlready = true;
+        }
 
         mAuth = FirebaseAuth.getInstance();
         rootref = FirebaseDatabase.getInstance().getReference();

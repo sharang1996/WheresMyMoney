@@ -17,17 +17,25 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
+import static com.example.sharang.wheresmymoney.Splash.calledAlready;
+
 public class SignIn extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     EditText password,email;
     Button login,signup;
+    //static boolean calledAlready = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signin);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        if (!calledAlready)
+        {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            calledAlready = true;
+        }
 
         mAuth = FirebaseAuth.getInstance();
         password = (EditText)findViewById(R.id.input_password);
@@ -44,7 +52,7 @@ public class SignIn extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if(task.isSuccessful()){
-                                    Intent i = new Intent(SignIn.this,MainActivity.class);
+                                    Intent i = new Intent(SignIn.this,Main2Activity.class);
                                     i.putExtra("email",email.getText().toString());
                                     startActivity(i);
                                 }

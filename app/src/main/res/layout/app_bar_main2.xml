@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.example.sharang.wheresmymoney.MainActivity">
+    tools:context="com.example.sharang.wheresmymoney.Main2Activity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -20,6 +20,8 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_main2" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -66,7 +68,5 @@
             android:layout_marginBottom="6dp" />
 
     </RelativeLayout>
-
-    <include layout="@layout/content_main" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -10,15 +10,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity
-            android:name=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-
         <activity android:name=".SignUp" />
-
         <activity android:name=".SignIn" />
-
         <activity
             android:name=".Splash"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -30,29 +23,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".IncomeCategoryActivity"
             android:label="Select a category"
             android:noHistory="true"
             android:theme="@android:style/Theme.Holo.Light.Dialog" />
-
         <activity
             android:name=".IncomeDialogActivity"
             android:label="Enter Details"
             android:noHistory="true" />
-
         <activity
             android:name=".ExpenditureCategoryActivity"
             android:label="Select a category"
             android:noHistory="true"
-            android:theme="@android:style/Theme.Holo.Light.Dialog"/>
-
+            android:theme="@android:style/Theme.Holo.Light.Dialog" />
         <activity
             android:name=".ExpenditureDialogActivity"
             android:label="Enter Details"
-            android:noHistory="true"/>
-
+            android:noHistory="true" />
+        <activity
+            android:name=".Main2Activity"
+            android:label="Summary"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".History"></activity>
     </application>
 
 </manifest>

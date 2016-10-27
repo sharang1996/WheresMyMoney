@@ -92,15 +92,71 @@ public class User {
     public void calculateBalance()
     {
         double incomeSum=0,expenditureSum=0;
-        for(Income i:incomes)
+
+        if(incomes!=null && incomes.size()!=0)
         {
-            incomeSum+=i.getAmount();
-        }
-        for(Expenditure i : expenditures)
-        {
-            expenditureSum+=i.getAmount();
+            for (Income i : incomes) {
+                incomeSum += i.getAmount();
+            }
         }
 
+        if(expenditures!=null && expenditures.size()!=0)
+        {
+            for (Expenditure i : expenditures) {
+                expenditureSum += i.getAmount();
+            }
+        }
         setBalance(incomeSum-expenditureSum);
+    }
+
+    public ArrayList<HistoryItem> getChronologicalEvent() {
+
+        int i=0,j=0;
+        ArrayList<HistoryItem> historyItems = new ArrayList<>();
+        if( incomes==null || expenditures==null)
+        {
+            return null;
+        }
+        while(i < incomes.size() && j < expenditures.size())
+        {
+            if(incomes.get(i).getTimestamp() < (expenditures.get(j).getTimestamp()))
+            {
+                historyItems.add(new HistoryItem(incomes.get(i).getAmount(),
+                        incomes.get(i).getCategory(),incomes.get(i).getDescription(),
+                        incomes.get(i).getTimestamp(),true));
+                i++;
+            }
+            else
+            {
+                historyItems.add(new HistoryItem(expenditures.get(j).getAmount(),
+                        expenditures.get(j).getCategory(),expenditures.get(j).getDescription(),
+                        expenditures.get(j).getTimestamp(),false));
+                j++;
+            }
+        }
+
+        if(i < incomes.size())
+        {
+            while(i < incomes.size())
+            {
+                historyItems.add(new HistoryItem(incomes.get(i).getAmount(),
+                        incomes.get(i).getCategory(),incomes.get(i).getDescription(),
+                        incomes.get(i).getTimestamp(),true));
+                i++;
+            }
+        }
+
+        if(j<expenditures.size())
+        {
+            while(j<expenditures.size())
+            {
+                historyItems.add(new HistoryItem(expenditures.get(j).getAmount(),
+                        expenditures.get(j).getCategory(),expenditures.get(j).getDescription(),
+                        expenditures.get(j).getTimestamp(),false));
+                j++;
+            }
+        }
+
+        return historyItems;
     }
 }
