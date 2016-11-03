@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 /**
  * Created by sharang on 26/10/16.
  */
-public class HistoryCustomAdapter extends BaseAdapter {
+public class HistoryCustomAdapter extends ArrayAdapter {
 
     Context context;
     ArrayList<HistoryItem> historyItems;
@@ -28,6 +29,7 @@ public class HistoryCustomAdapter extends BaseAdapter {
     private static LayoutInflater inflater=null;
 
     public HistoryCustomAdapter(Context context, ArrayList<HistoryItem> historyItems, HashMap<String, String> iconMapper) {
+        super(context,R.layout.history_item,historyItems);
         this.context=context;
         this.historyItems=historyItems;
         this.iconMapper=iconMapper;
@@ -37,12 +39,12 @@ public class HistoryCustomAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return historyItems.size();
+        return historyItems != null ? historyItems.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return historyItems.get(position);
     }
 
     @Override
@@ -53,17 +55,32 @@ public class HistoryCustomAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        Holder holder = new Holder();
-        View rowView;
+        Holder holder;
+        if (convertView == null) {
+            holder = new Holder();
+            LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = vi.inflate(R.layout.history_item, parent, false);
+
+            holder.tvCat = (TextView)convertView.findViewById(R.id.tv_category);
+            holder.tvAmt = (TextView)convertView.findViewById(R.id.tv_amount);
+            holder.tvDate = (TextView)convertView.findViewById(R.id.tv_date);
+            holder.img = (ImageView)convertView.findViewById(R.id.iv);
+            convertView.setTag(holder);
+
+        }
+
+        holder=(Holder)convertView.getTag();
+        //Holder holder = new Holder();
+        //View rowView;
         HistoryItem historyItem;
+        //rowView=inflater.inflate(R.layout.history_item,null);
 
         historyItem = historyItems.get(position);
-        rowView=inflater.inflate(R.layout.history_item,null);
 
-        holder.tvCat = (TextView)rowView.findViewById(R.id.tv_category);
+        /*holder.tvCat = (TextView)rowView.findViewById(R.id.tv_category);
         holder.tvAmt = (TextView)rowView.findViewById(R.id.tv_amount);
         holder.tvDate = (TextView)rowView.findViewById(R.id.tv_date);
-        holder.img = (ImageView)rowView.findViewById(R.id.iv);
+        holder.img = (ImageView)rowView.findViewById(R.id.iv);*/
 
         //ToDo : fill in the data for these fields
 
@@ -82,7 +99,14 @@ public class HistoryCustomAdapter extends BaseAdapter {
         int resID = res.getIdentifier(mDrawableName , "drawable", context.getPackageName());
         holder.img.setImageResource(resID);
 
-        return rowView;
+        return convertView;
+    }
+
+    public void refresh(ArrayList<HistoryItem> historyItems)
+    {
+        this.historyItems.clear();
+        this.historyItems.addAll(historyItems);
+        //notifyDataSetChanged();
     }
 
     public class Holder

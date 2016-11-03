@@ -289,8 +289,10 @@ public class Main2Activity extends AppCompatActivity
             Intent  i = new Intent(Main2Activity.this,History.class);
 
             Bundle information = new Bundle();
+            Log.i("#####","main2activity : "+user.getChronologicalEvent().toString());
             information.putSerializable("historyitem", user.getChronologicalEvent());
             i.putExtras(information);
+            i.putExtra("email",email);
 
             startActivity(i);
             /*for(HistoryItem historyItem : historyItems)
@@ -304,15 +306,39 @@ public class Main2Activity extends AppCompatActivity
              */
 
         } else if (id == R.id.nav_max_income) {
+            Intent  i = new Intent(Main2Activity.this,MaxIncome.class);
+
+            Income maxIncome = user.getMaxIncome();
+            if(maxIncome==null) Toast.makeText(Main2Activity.this,"No income presently",Toast.LENGTH_SHORT).show();
+            else{
+                i.putExtra("description",maxIncome.getDescription());
+                i.putExtra("amount",maxIncome.getAmount());
+                i.putExtra("category",maxIncome.getCategory());
+                i.putExtra("timestamp",maxIncome.getTimestamp());
+
+                startActivity(i);
+            }
+
 
         } else if (id == R.id.nav_max_expenditure) {
+            Intent  i = new Intent(Main2Activity.this,MaxExpenditure.class);
+            Expenditure maxExpenditure = user.getMaxExpenditure();
+            if(maxExpenditure==null) Toast.makeText(Main2Activity.this,"No expenditure presently",Toast.LENGTH_SHORT).show();
+            else{
+                i.putExtra("description",maxExpenditure.getDescription());
+                i.putExtra("amount",maxExpenditure.getAmount());
+                i.putExtra("category",maxExpenditure.getCategory());
+                i.putExtra("timestamp",maxExpenditure.getTimestamp());
+
+                startActivity(i);
+            }
 
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_exit) {
-
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

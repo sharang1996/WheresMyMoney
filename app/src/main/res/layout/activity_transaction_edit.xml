@@ -12,8 +12,8 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/et_amount"
-        android:hint="Amount spent"
+        android:id="@+id/edit_amount"
+        android:hint="New Amount"
         android:inputType="number"
         />
 
@@ -25,13 +25,13 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/et_description"
+        android:id="@+id/edit_description"
         android:inputType="textLongMessage"
-        android:hint="Enter where you spent it"
+        android:hint="Change description"
         />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bnclick"
+        android:id="@+id/bclick"
         android:text="OK"/>
 </LinearLayout>

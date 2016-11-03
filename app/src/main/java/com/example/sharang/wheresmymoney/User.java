@@ -113,9 +113,33 @@ public class User {
 
         int i=0,j=0;
         ArrayList<HistoryItem> historyItems = new ArrayList<>();
-        if( incomes==null || expenditures==null)
+        if( incomes==null && expenditures==null)
         {
             return null;
+        }
+        else
+        if(incomes==null && expenditures!=null)
+        {
+            while(j<expenditures.size())
+            {
+                historyItems.add(new HistoryItem(expenditures.get(j).getAmount(),
+                        expenditures.get(j).getCategory(),expenditures.get(j).getDescription(),
+                        expenditures.get(j).getTimestamp(),false));
+                j++;
+            }
+            return historyItems;
+        }
+        else
+        if(incomes!=null && expenditures==null)
+        {
+            while(i < incomes.size())
+            {
+                historyItems.add(new HistoryItem(incomes.get(i).getAmount(),
+                        incomes.get(i).getCategory(),incomes.get(i).getDescription(),
+                        incomes.get(i).getTimestamp(),true));
+                i++;
+            }
+            return historyItems;
         }
         while(i < incomes.size() && j < expenditures.size())
         {
@@ -158,5 +182,111 @@ public class User {
         }
 
         return historyItems;
+    }
+
+    public void removeIncome(HistoryItem item) {
+
+        Income i = null;
+        for(Income income : incomes)
+        {
+            if(item.getTimestamp()==income.getTimestamp())
+            {
+                i=income;
+            }
+        }
+        if(i!=null)
+        {
+            incomes.remove(i);
+            calculateBalance();
+        }
+
+    }
+
+    public void removeExpenditure(HistoryItem item) {
+
+        Expenditure e = null;
+        for(Expenditure expenditure : expenditures)
+        {
+            if(item.getTimestamp()==expenditure.getTimestamp())
+            {
+                e = expenditure;
+            }
+        }
+        if(e!=null)
+        {
+            expenditures.remove(e);
+            calculateBalance();
+        }
+    }
+
+    public void makeEdit(HistoryItem h) {
+        //ToDo : make edt from historyItem!!!
+
+        if(h.isIncome())
+        {
+            Income i = null;
+            int position=0;
+            for(Income income : incomes)
+            {
+                if(h.getTimestamp()==income.getTimestamp())
+                {
+                    i=income;
+                    position = incomes.indexOf(i);
+                }
+            }
+            if(i!=null)
+            {
+                incomes.remove(i);
+                i.setDescription(h.getDescription());
+                i.setAmount(h.getAmount());
+                incomes.add(position,i);
+                calculateBalance();
+            }
+        }
+        else
+        {
+            Expenditure e = null;
+            int position=0;
+            for(Expenditure expenditure : expenditures)
+            {
+                if(h.getTimestamp()==expenditure.getTimestamp())
+                {
+                    e=expenditure;
+                    position = expenditures.indexOf(e);
+                }
+            }
+            if(e!=null)
+            {
+                expenditures.remove(e);
+                e.setDescription(h.getDescription());
+                e.setAmount(h.getAmount());
+                expenditures.add(position,e);
+                calculateBalance();
+            }
+        }
+    }
+
+    public Income getMaxIncome() {
+        Income maxIncome = new Income(0,"","",0);
+        if(incomes==null || incomes.size()==0) return null;
+        for(Income income : incomes)
+        {
+            if(maxIncome.getAmount()<income.getAmount())
+            {
+                maxIncome = income;
+            }
+        }
+        return maxIncome;
+    }
+
+    public Expenditure getMaxExpenditure() {
+        Expenditure maxExpenditure = new Expenditure(0,"","",0);
+        if(expenditures==null || expenditures.size()==0) return null;
+        for(Expenditure expenditure : expenditures)
+        {
+            if(maxExpenditure.getAmount()<expenditure.getAmount())
+                maxExpenditure=expenditure;
+        }
+        return maxExpenditure;
     }
 }

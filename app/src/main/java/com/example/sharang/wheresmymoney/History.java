@@ -1,18 +1,43 @@
 package com.example.sharang.wheresmymoney;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class History extends AppCompatActivity {
 
     Context context;
-    ListView lv;
+    SwipeMenuListView lv;
+    String email;
     ArrayList<HistoryItem> historyItems;
+    HistoryCustomAdapter adapter;
+    DatabaseReference rootref;
+    User user;
+    HistoryItem h;
+    int position;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,12 +45,204 @@ public class History extends AppCompatActivity {
 
         context=this;
         historyItems = (ArrayList<HistoryItem>) getIntent().getSerializableExtra("historyitem");
+        Log.i("#####","History : "+historyItems.toString());
+        email = getIntent().getStringExtra("email");
 
-        lv = (ListView)findViewById(R.id.lv);
-        lv.setAdapter(new HistoryCustomAdapter(context,historyItems,populateIconMapper()));
+        rootref = FirebaseDatabase.getInstance().getReference();
+
+        rootref.child("user").orderByChild("email").equalTo(email).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {
+                    user = messageSnapshot.getValue(User.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        lv = (SwipeMenuListView)findViewById(R.id.lv);
+        adapter = new HistoryCustomAdapter(context,historyItems,populateIconMapper());
+        lv.setAdapter(adapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent i = new Intent(History.this,Details.class);
+                i.putExtra("description",historyItems.get(position).getDescription());
+                i.putExtra("amount",historyItems.get(position).getAmount());
+                i.putExtra("category",historyItems.get(position).getCategory());
+                i.putExtra("timestamp",historyItems.get(position).getTimestamp());
+                if(historyItems.get(position).isIncome())
+                    i.putExtra("isIncome",true);
+                else i.putExtra("isIncome",false);
+                startActivity(i);
+            }
+        });
+
+
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                return false;
+            }
+        });
+
+
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+            @Override
+            public void create(SwipeMenu menu) {
+                // create "open" item
+                SwipeMenuItem openItem = new SwipeMenuItem(
+                        getApplicationContext());
+                // set item background
+                openItem.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
+                        0xCE)));
+                // set item width
+                openItem.setWidth(200);
+                // set item title
+
+
+                /*
+
+                openItem.setTitle("Edit");
+                // set item title fontsize
+                openItem.setTitleSize(18);
+                // set item title font color
+                openItem.setTitleColor(Color.WHITE);
+
+                */
+
+                openItem.setIcon(R.drawable.ic_edit);
+
+                // add to menu
+                menu.addMenuItem(openItem);
+
+                // create "delete" item
+                SwipeMenuItem deleteItem = new SwipeMenuItem(
+                        getApplicationContext());
+                // set item background
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
+                        0xCE)));
+                // set item width
+                deleteItem.setWidth(200);
+                // set a icon
+                deleteItem.setIcon(R.drawable.ic_delete);
+                // add to menu
+                menu.addMenuItem(deleteItem);
+            }
+        };
+
+// set creator
+        lv.setMenuCreator(creator);
+
+        lv.setOnSwipeListener(new SwipeMenuListView.OnSwipeListener() {
+
+            @Override
+            public void onSwipeStart(int position) {
+                // swipe start
+            }
+
+            @Override
+            public void onSwipeEnd(int position) {
+                // swipe end
+                //Toast.makeText(History.this,"It works!!!!!",Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+        lv.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                HistoryItem item = historyItems.get(position);
+                switch (index) {
+                    case 0:
+                        //ToDo edit
+                        editTransaction(position);
+                        break;
+                    case 1:
+                        //ToDo delete
+
+                        historyItems.remove(position);
+                        adapter.notifyDataSetChanged();
+
+                        if(item.isIncome())
+                        {
+                            user.removeIncome(item);
+                        }
+
+                        else
+                        {
+                            user.removeExpenditure(item);
+                        }
+
+                        Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
+                        Map<String, Object> childUpdates = new HashMap<>();
+                        childUpdates.put(user.getUid(),usermap);
+
+                        rootref.child("user").updateChildren(childUpdates);
+
+                        break;
+                }
+                return false;
+            }});
+
     }
 
+    private void editTransaction(int position) {
+        h = historyItems.get(position);
+        historyItems.remove(position);
+        this.position = position;
 
+        Intent i = new Intent(History.this,TransactionEdit.class);
+        Log.i("#####",h.getAmount()+""+h.getDescription());
+        i.putExtra("Amount",h.getAmount());
+        i.putExtra("Description",h.getDescription());
+        startActivityForResult(i,5);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 5 && resultCode == RESULT_OK) {
+            String description = data.getStringExtra("description");
+            if (description == null) description = "no description";
+
+            double amount = Double.parseDouble(data.getStringExtra("amount"));
+
+            h.setDescription(description);
+            h.setAmount(amount);
+            //h.setTimestamp(System.currentTimeMillis());
+
+            //adapter.add(h);
+            historyItems.add(position,h);
+            //adapter.notifyDataSetChanged();
+            //adapter.refresh(historyItems);
+            //adapter.clear();
+            //adapter.addAll(historyItems);
+
+            adapter.notifyDataSetChanged();
+            //lv.setAdapter(adapter);
+
+            user.makeEdit(h);
+
+            Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put(user.getUid(), usermap);
+
+            rootref.child("user").updateChildren(childUpdates);
+
+            Toast.makeText(History.this, description + " " + amount, Toast.LENGTH_SHORT).show();
+        }
+    }
     private HashMap<String,String> populateIconMapper() {
 
         HashMap<String,String> iconMapper = new HashMap<>();
