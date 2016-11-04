@@ -46,6 +46,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -411,6 +412,11 @@ public class Main2Activity extends AppCompatActivity
             startActivity(i);
 
         } else if (id == R.id.nav_share) {
+            StringBuilder sb = composeString(user.getChronologicalEvent());
+            Intent i = new Intent(Main2Activity.this,Share.class);
+            i.putExtra("transactions",sb.toString());
+            i.putExtra("name",user.getName());
+            startActivity(i);
 
         }else if (id == R.id.nav_about) {
             Intent  i = new Intent(Main2Activity.this,AboutUs.class);
@@ -420,6 +426,16 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private StringBuilder composeString(ArrayList<HistoryItem> chronologicalEvent) {
+
+        StringBuilder sb = new StringBuilder();
+        for(HistoryItem hi : chronologicalEvent)
+        {
+            sb.append(hi.toString());
+        }
+        return sb;
     }
 
     private void selectImage() {

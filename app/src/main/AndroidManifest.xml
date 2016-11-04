@@ -55,7 +55,8 @@
         <activity android:name=".TotalIncome" />
         <activity android:name=".TotalExpenditure" />
         <activity android:name=".AboutUs" />
-        <activity android:name=".Profile"></activity>
+        <activity android:name=".Profile" />
+        <activity android:name=".Share"></activity>
     </application>
 
 </manifest>

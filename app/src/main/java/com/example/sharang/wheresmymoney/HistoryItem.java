@@ -3,7 +3,10 @@ package com.example.sharang.wheresmymoney;
 import android.os.Parcel;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by sharang on 24/10/16.
@@ -70,5 +73,21 @@ public class HistoryItem implements Serializable {
 
     public void setIncome(boolean income) { isIncome = income; }
 
-    public String toString(){ return ""+amount+" "+category+" "+description+" "; }
+    public String toString(){
+        StringBuffer s = new StringBuffer();
+        if(this.isIncome()) s.append("INCOME : \t \n");
+        else s.append("EXPENDITURE : \t \n");
+        s.append("CATEGORY :\t" +this.getCategory()+"\n");
+        s.append("AMOUNT :\t" +this.getAmount()+"\n");
+        s.append("DESCRIPTION :\t" +this.getDescription()+"\n");
+
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd kk:mm:ss");
+        Calendar c    = Calendar.getInstance();
+        c.setTimeInMillis(this.getTimestamp());
+        Date day      = c.getTime();
+
+        s.append("DATE AND TIME :\t" +df.format(day)+"\n\n");
+
+        return s.toString();
+    }
 }
