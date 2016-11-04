@@ -164,11 +164,11 @@ public class History extends AppCompatActivity {
                 HistoryItem item = historyItems.get(position);
                 switch (index) {
                     case 0:
-                        //ToDo edit
+
                         editTransaction(position);
+
                         break;
                     case 1:
-                        //ToDo delete
 
                         historyItems.remove(position);
                         adapter.notifyDataSetChanged();

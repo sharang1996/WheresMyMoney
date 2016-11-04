@@ -1,9 +1,22 @@
 package com.example.sharang.wheresmymoney;
 
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -26,6 +39,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,14 +56,24 @@ import static com.example.sharang.wheresmymoney.Splash.calledAlready;
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int SELECT_FILE = 9;
+    private static final int REQUEST_CAMERA = 10;
     String uid;
     DatabaseReference rootref;
     String email;
     User user;
     private Income newIncome;
     private Expenditure newExpenditure;
-    TextView tv;
+    TextView tv,navname,navemail;
     ImageView profilePicture;
+    private String userChoosenTask;
+    private String strBase64;
+    NavigationView navigationView;
+    SharedPreferences prefs;
+    SharedPreferences.Editor editor;
+
+    //Done : add profile picture from camera intent or local storage...
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +97,32 @@ public class Main2Activity extends AppCompatActivity
 
         tv = (TextView)findViewById(R.id.textView);
 
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        View headerView = navigationView.getHeaderView(0);
+
+
+
+        profilePicture = (de.hdodenhof.circleimageview.CircleImageView)headerView.findViewById(R.id.profile_image);
+        navemail =(TextView) headerView.findViewById(R.id.email);
+        navname =(TextView) headerView.findViewById(R.id.name);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String encodedBitmap = preferences.getString("encodedBitmap","nosavedimage");
+        if(encodedBitmap.equals("nosavedimage"))
+            profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.nopp));
+        else{
+            byte[] imageAsBytes = Base64.decode(encodedBitmap.getBytes(),Base64.DEFAULT);
+            profilePicture.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
+        }
+        profilePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectImage();
+            }
+        });
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -90,9 +144,8 @@ public class Main2Activity extends AppCompatActivity
                     else
                     if(user.getBalance()<0)
                         tv.setTextColor(Color.RED);
-
-
-
+                    navname.setText(user.getName());
+                    navemail.setText(user.getEmail());
                 }
             }
 
@@ -130,7 +183,7 @@ public class Main2Activity extends AppCompatActivity
                 addIncomeDialog();
                 user.calculateBalance();
                 tv.setText(user.getBalance()+"");
-                // TODO: 20/10/16  update the firebase database
+                // DONE: 20/10/16  update the firebase database
 
                 Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
                 Map<String, Object> childUpdates = new HashMap<>();
@@ -146,7 +199,7 @@ public class Main2Activity extends AppCompatActivity
                 addExpenditureDialog();
                 user.calculateBalance();
                 tv.setText(user.getBalance()+"");
-                // TODO: 20/10/16  update the firebase database
+                // DONE: 20/10/16  update the firebase database
 
                 Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
                 Map<String, Object> childUpdates = new HashMap<>();
@@ -162,8 +215,6 @@ public class Main2Activity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
     }
 
 
@@ -180,21 +231,19 @@ public class Main2Activity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1 && resultCode == RESULT_OK)
-        {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             String category = data.getStringExtra("category");
-            if(category==null) category = "other";
+            if (category == null) category = "other";
 
             newIncome = new Income(category);
 
-            startActivityForResult(new Intent(Main2Activity.this,IncomeDialogActivity.class) , 2);
+            startActivityForResult(new Intent(Main2Activity.this, IncomeDialogActivity.class), 2);
 
-            Toast.makeText(Main2Activity.this,category+" selected",Toast.LENGTH_SHORT).show();
+            Toast.makeText(Main2Activity.this, category + " selected", Toast.LENGTH_SHORT).show();
         }
-        if(requestCode == 2 && resultCode == RESULT_OK)
-        {
+        if (requestCode == 2 && resultCode == RESULT_OK) {
             String description = data.getStringExtra("description");
-            if(description==null) description = "no description";
+            if (description == null) description = "no description";
 
             double amount = Double.parseDouble(data.getStringExtra("amount"));
 
@@ -206,29 +255,27 @@ public class Main2Activity extends AppCompatActivity
 
             Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
             Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put(uid,usermap);
+            childUpdates.put(uid, usermap);
 
             rootref.child("user").updateChildren(childUpdates);
 
-            Toast.makeText(Main2Activity.this,description+" " + amount,Toast.LENGTH_SHORT).show();
+            Toast.makeText(Main2Activity.this, description + " " + amount, Toast.LENGTH_SHORT).show();
         }
 
-        if(requestCode == 3 && resultCode == RESULT_OK)
-        {
+        if (requestCode == 3 && resultCode == RESULT_OK) {
             String category = data.getStringExtra("category");
-            if(category==null) category = "other";
+            if (category == null) category = "other";
 
             newExpenditure = new Expenditure(category);
 
-            startActivityForResult(new Intent(Main2Activity.this,ExpenditureDialogActivity.class) , 4);
+            startActivityForResult(new Intent(Main2Activity.this, ExpenditureDialogActivity.class), 4);
 
-            Toast.makeText(Main2Activity.this,category+" selected",Toast.LENGTH_SHORT).show();
+            Toast.makeText(Main2Activity.this, category + " selected", Toast.LENGTH_SHORT).show();
         }
 
-        if(requestCode == 4 && resultCode == RESULT_OK)
-        {
+        if (requestCode == 4 && resultCode == RESULT_OK) {
             String description = data.getStringExtra("description");
-            if(description==null) description = "no description";
+            if (description == null) description = "no description";
 
             double amount = Double.parseDouble(data.getStringExtra("amount"));
 
@@ -240,9 +287,17 @@ public class Main2Activity extends AppCompatActivity
 
             Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
             Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put(uid,usermap);
+            childUpdates.put(uid, usermap);
             rootref.child("user").updateChildren(childUpdates);
-            Toast.makeText(Main2Activity.this,description+" " + amount,Toast.LENGTH_SHORT).show();
+            Toast.makeText(Main2Activity.this, description + " " + amount, Toast.LENGTH_SHORT).show();
+        }
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == SELECT_FILE)
+                onSelectFromGalleryResult(data);
+            else if (requestCode == REQUEST_CAMERA)
+                onCaptureImageResult(data);
+
         }
     }
 
@@ -284,6 +339,15 @@ public class Main2Activity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        if(id==R.id.profile){
+            Intent i = new Intent(Main2Activity.this,Profile.class);
+            i.putExtra("name",user.getName());
+            i.putExtra("email",user.getEmail());
+            i.putExtra("password",user.getPassword());
+            //i.putExtra("profilepic",PreferenceManager.getDefaultSharedPreferences(this).getString("encodedBitmap","nosavedimage"));
+            i.putExtra("name",user.getName());
+            startActivity(i);
+        }
         if (id == R.id.history) {
 
 
@@ -334,17 +398,155 @@ public class Main2Activity extends AppCompatActivity
                 startActivity(i);
             }
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_total_income) {
+
+            Intent  i = new Intent(Main2Activity.this,TotalIncome.class);
+            i.putExtra("total_income",user.getTotalIncome());
+            startActivity(i);
+
+        } else if (id == R.id.nav_total_expenditure) {
+
+            Intent  i = new Intent(Main2Activity.this,TotalExpenditure.class);
+            i.putExtra("total_exp",user.getTotalExpenditure());
+            startActivity(i);
 
         } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_exit) {
-            finish();
+        }else if (id == R.id.nav_about) {
+            Intent  i = new Intent(Main2Activity.this,AboutUs.class);
+            startActivity(i);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void selectImage() {
+        final CharSequence[] items = { "Take Photo", "Choose from Library",
+                "Cancel" };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(Main2Activity.this);
+        builder.setTitle("Add Photo!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                boolean result=Utility.checkPermission(Main2Activity.this);
+
+                if (items[item].equals("Take Photo")) {
+                    userChoosenTask="Take Photo";
+                    if(result)
+                        cameraIntent();
+
+                } else if (items[item].equals("Choose from Library")) {
+                    userChoosenTask="Choose from Library";
+                    if(result)
+                        galleryIntent();
+
+                } else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
+    private void cameraIntent()
+    {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, REQUEST_CAMERA);
+    }
+
+    private void galleryIntent()
+    {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);//
+        startActivityForResult(Intent.createChooser(intent, "Select File"),SELECT_FILE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(userChoosenTask.equals("Take Photo"))
+                        cameraIntent();
+                    else if(userChoosenTask.equals("Choose from Library"))
+                        galleryIntent();
+                } else {
+                    //code for deny
+                    profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.nopp));
+                }
+                break;
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void onSelectFromGalleryResult(Intent data) {
+        Bitmap bm=null;
+        if (data != null) {
+            try {
+                bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        final int REQUIRED_SIZE = 200;
+        int scale = 1;
+        while (options.outWidth / scale / 2 >= REQUIRED_SIZE
+                && options.outHeight / scale / 2 >= REQUIRED_SIZE)
+            scale *= 2;
+        options.inSampleSize = scale;
+        options.inJustDecodeBounds = false;
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+        profilePicture.setImageBitmap(bm);
+
+        //Convert Bitmap to Base64
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        strBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = prefs.edit();
+        editor.putString("encodedBitmap",strBase64);
+        editor.apply();
+    }
+
+
+    private void onCaptureImageResult(Intent data) {
+        Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+        File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
+        FileOutputStream fo;
+        try {
+            file.createNewFile();
+            fo = new FileOutputStream(file);
+            fo.write(bytes.toByteArray());
+            fo.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        profilePicture.setImageBitmap(bitmap);
+
+        //Convert Bitmap to Base64
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        strBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = prefs.edit();
+        editor.putString("encodedBitmap",strBase64);
+        editor.apply();
     }
 
 }

@@ -2,22 +2,32 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/profile"
+            android:icon="@drawable/profile"
+            android:title="Profile" />
+
         <item
             android:id="@+id/history"
             android:icon="@drawable/history"
             android:title="History" />
         <item
             android:id="@+id/nav_max_income"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/maxincome"
             android:title="Maximum Income" />
         <item
             android:id="@+id/nav_max_expenditure"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/maxexpend"
             android:title="Maximum Expenditure" />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Unused item" />
+            android:id="@+id/nav_total_income"
+            android:icon="@drawable/totalincome"
+            android:title="Total Income" />
+        <item
+            android:id="@+id/nav_total_expenditure"
+            android:icon="@drawable/totalexp"
+            android:title="Total Expenditure" />
     </group>
 
     <item android:title="Communicate">
@@ -27,9 +37,9 @@
                 android:icon="@drawable/ic_menu_share"
                 android:title="Share" />
             <item
-                android:id="@+id/nav_exit"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Exit" />
+                android:id="@+id/nav_about"
+                android:icon="@drawable/aboutus"
+                android:title="About Us" />
         </menu>
     </item>
 

@@ -3,6 +3,8 @@
     package="com.example.sharang.wheresmymoney">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -49,7 +51,11 @@
         <activity android:name=".TransactionEdit" />
         <activity android:name=".Details" />
         <activity android:name=".MaxIncome" />
-        <activity android:name=".MaxExpenditure"></activity>
+        <activity android:name=".MaxExpenditure" />
+        <activity android:name=".TotalIncome" />
+        <activity android:name=".TotalExpenditure" />
+        <activity android:name=".AboutUs" />
+        <activity android:name=".Profile"></activity>
     </application>
 
 </manifest>

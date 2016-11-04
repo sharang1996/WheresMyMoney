@@ -82,7 +82,6 @@ public class HistoryCustomAdapter extends ArrayAdapter {
         holder.tvDate = (TextView)rowView.findViewById(R.id.tv_date);
         holder.img = (ImageView)rowView.findViewById(R.id.iv);*/
 
-        //ToDo : fill in the data for these fields
 
         holder.tvCat.setText(historyItem.getCategory());
         holder.tvAmt.setText(historyItem.getAmount()+"");

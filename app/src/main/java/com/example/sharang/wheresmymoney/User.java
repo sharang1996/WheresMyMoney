@@ -220,7 +220,7 @@ public class User {
     }
 
     public void makeEdit(HistoryItem h) {
-        //ToDo : make edt from historyItem!!!
+        //DONE : make edt from historyItem!!!
 
         if(h.isIncome())
         {
@@ -288,5 +288,23 @@ public class User {
                 maxExpenditure=expenditure;
         }
         return maxExpenditure;
+    }
+
+    public String getTotalIncome() {
+        double sum = 0.0;
+        if(incomes == null || incomes.size() == 0) return ""+0;
+        for(Income income:incomes){
+            sum += income.getAmount();
+        }
+        return ""+sum;
+    }
+
+    public String getTotalExpenditure() {
+        double sum = 0.0;
+        if(expenditures == null || expenditures.size() == 0) return ""+0;
+        for(Expenditure expenditure:expenditures){
+            sum += expenditure.getAmount();
+        }
+        return ""+sum;
     }
 }
