@@ -87,7 +87,6 @@ public class HistoryItem implements Serializable {
         Date day      = c.getTime();
 
         s.append("DATE AND TIME :\t" +df.format(day)+"\n\n");
-
         return s.toString();
     }
 }
