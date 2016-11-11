@@ -14,8 +14,10 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -29,8 +31,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.OvershootInterpolator;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +59,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.example.sharang.wheresmymoney.Splash.calledAlready;
@@ -67,8 +75,9 @@ public class Main2Activity extends AppCompatActivity
     User user;
     private Income newIncome;
     private Expenditure newExpenditure;
-    TextView sign,navname,navemail;
+    TextView navname,navemail;
     ImageView profilePicture;
+    ImageButton coin;
     private String userChoosenTask;
     private String strBase64;
     NavigationView navigationView;
@@ -78,11 +87,80 @@ public class Main2Activity extends AppCompatActivity
     ProfilePictureAdd adder;
     LinearLayout ll;
     TickerView tickerView;
+    int fyear,fmonth,fday,tyear,tmonth,tday;
+    String queryCategory;
+    EditText min,max;
+    ArrayList<HistoryItem> queryResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
+        fyear = fmonth = fday = tday = tmonth = tyear = 0;
+
+        min = (EditText)findViewById(R.id.input_minamt);
+        max = (EditText)findViewById(R.id.input_maxamt);
+
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+
+        final List<String> categories = new ArrayList<>();
+        categories.add("None selected");
+        categories.add("Financial Income");
+        categories.add("Gambling");
+        categories.add("Odd jobs");
+        categories.add("Personal Savings");
+        categories.add("Pension");
+        categories.add("Rent");
+        categories.add("Salary");
+        categories.add("Home");
+        categories.add("Debt");
+        categories.add("Accomodation");
+        categories.add("Bar");
+        categories.add("Books/Magazines");
+        categories.add("Car");
+        categories.add("Children");
+        categories.add("Cigarettes");
+        categories.add("Clothing");
+        categories.add("Eating Out");
+        categories.add("Family");
+        categories.add("Fuel");
+        categories.add("Gambling Losses");
+        categories.add("Gifts");
+        categories.add("Health");
+        categories.add("Home");
+        categories.add("Insurance");
+        categories.add("Pets");
+        categories.add("Rent");
+        categories.add("Shoes");
+        categories.add("Shopping");
+        categories.add("Tax");
+        categories.add("Transport");
+        categories.add("Other");
+
+        // Creating adapter for spinner
+        final ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
+
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);
+
+        // Spinner click listener
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                //Toast.makeText(Main2Activity.this,categories.get(position),Toast.LENGTH_SHORT).show();
+                queryCategory = categories.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         fuser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -105,8 +183,6 @@ public class Main2Activity extends AppCompatActivity
         tickerView.setAnimationInterpolator(new OvershootInterpolator());
         tickerView.setGravity(Gravity.START);
 
-        sign = (TextView)findViewById(R.id.sign);
-        sign.setTextSize(300);
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -116,6 +192,40 @@ public class Main2Activity extends AppCompatActivity
         profilePicture = (de.hdodenhof.circleimageview.CircleImageView)headerView.findViewById(R.id.profile_image);
         navemail =(TextView) headerView.findViewById(R.id.email);
         navname =(TextView) headerView.findViewById(R.id.name);
+
+        coin=(ImageButton)findViewById(R.id.assistant);
+        coin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(TextUtils.isEmpty(queryCategory))
+                {
+                    queryCategory = "None selected";
+                }
+                double maxamt,minamt;
+                if(TextUtils.isEmpty(min.getText().toString()))
+                {
+                    minamt = 0;
+                }
+                else{
+                    minamt = Double.parseDouble(min.getText().toString());
+                }
+                if(TextUtils.isEmpty(max.getText()))
+                {
+                    maxamt = Double.MAX_VALUE;
+                }
+                else
+                {
+                    maxamt = Double.parseDouble(max.getText().toString());
+                }
+
+                Intent i = new Intent(Main2Activity.this,QueryResult.class);
+
+                Bundle information = new Bundle();
+                information.putSerializable("queryresult", user.getTransactions(queryCategory,fday,fmonth,fyear,tday,tmonth,tyear,minamt,maxamt));
+                i.putExtras(information);
+                startActivity(i);
+            }
+        });
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String encodedBitmap = preferences.getString("encodedBitmap","nosavedimage");
@@ -156,14 +266,12 @@ public class Main2Activity extends AppCompatActivity
                     if(user.getBalance() >= 0)
                     {
                         ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.greenticker));
-                        sign.setVisibility(View.INVISIBLE);
                     }
 
                     else
                     if(user.getBalance() < 0)
                     {
                         ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.redticker));
-                        sign.setVisibility(View.VISIBLE);
                     }
 
                     navname.setText(user.getName());
@@ -210,14 +318,12 @@ public class Main2Activity extends AppCompatActivity
                 if(user.getBalance() >= 0)
                 {
                     ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.greenticker));
-                    sign.setVisibility(View.INVISIBLE);
                 }
 
                 else
                 if(user.getBalance() < 0)
                 {
                     ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.redticker));
-                    sign.setVisibility(View.VISIBLE);
                 }
 
                 tickerView.setText("" + (int) Math.abs(Math.floor(user.getBalance())));
@@ -240,14 +346,12 @@ public class Main2Activity extends AppCompatActivity
                 if(user.getBalance() >= 0)
                 {
                     ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.greenticker));
-                    sign.setVisibility(View.INVISIBLE);
                 }
 
                 else
                 if(user.getBalance() < 0)
                 {
                     ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.redticker));
-                    sign.setVisibility(View.VISIBLE);
                 }
 
                 tickerView.setText("" + (int) Math.abs(Math.floor(user.getBalance())));
@@ -636,4 +740,25 @@ public class Main2Activity extends AppCompatActivity
         editor.apply();
     }
 
+    public void showFromDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment();
+        newFragment.show(getSupportFragmentManager(), "Pick From Date");
+    }
+
+    public void onFromDateSelected(int year, int month, int day) {
+        fyear = year;
+        fmonth = month;
+        fday = day;
+    }
+
+    public void showToDatePickerDialog(View v) {
+        DialogFragment newFragment = new ToDatePickerFragment();
+        newFragment.show(getSupportFragmentManager(), "Pick Till Date");
+    }
+
+    public void onToDateSelected(int year, int month, int day) {
+        tyear = year;
+        tmonth = month;
+        tday = day;
+    }
 }

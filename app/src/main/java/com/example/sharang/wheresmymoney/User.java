@@ -320,14 +320,70 @@ public class User {
         int i=0,j=0;
         ArrayList<HistoryItem> historyItems=new ArrayList<>();
 
+
         Date fromdate=new Date(fyear,fmonth,fdate);
         Date todate=new Date(tyear,tmonth,tdate);
+
+        if(fyear==tyear&&fyear==0){
+            for(Income income:incomes){
+                if(category.equals("None selected")){
+                    if(income.getAmount()>=minamount||income.getAmount()<=maxamount){
+
+                        historyItems.add(new HistoryItem(income.getAmount(),
+                                income.getCategory(),income.getDescription(),
+                                income.getTimestamp(),true));
+                    }
+
+                }
+                else if(income.getCategory().equals(category)){
+                    if(income.getAmount()>=minamount||income.getAmount()<=maxamount){
+
+                        historyItems.add(new HistoryItem(income.getAmount(),
+                                income.getCategory(),income.getDescription(),
+                                income.getTimestamp(),true));
+                    }
+                }
+            }
+            for(Expenditure expense:expenditures){
+                if(category.equals("None selected")){
+                    if(expense.getAmount()>=minamount||expense.getAmount()<=maxamount){
+
+                        historyItems.add(new HistoryItem(expense.getAmount(),
+                                expense.getCategory(),expense.getDescription(),
+                                expense.getTimestamp(),false));
+                    }
+
+                }
+                else if(expense.getCategory().equals(category)){
+                    if(expense.getAmount()>=minamount||expense.getAmount()<=maxamount){
+
+                        historyItems.add(new HistoryItem(expense.getAmount(),
+                                expense.getCategory(),expense.getDescription(),
+                                expense.getTimestamp(),false));
+                    }
+                }
+            }
+            Collections.sort(historyItems,new CompDat());
+            return historyItems;
+
+        }
 
         long fromUnixTime = (long) fromdate.getTime()/1000;
         long toUnixTime = (long) todate.getTime()/1000;
 
         for(Income income:incomes){
-            if(income.getCategory().equals(category)&&(income.getTimestamp()>=fromUnixTime||income.getTimestamp()<=toUnixTime)){
+            if(income.getCategory().equals("None selected")){
+                if(income.getTimestamp() >= fromUnixTime || income.getTimestamp()<= toUnixTime){
+                    if(income.getAmount()>=minamount||income.getAmount()<=maxamount){
+
+                        historyItems.add(new HistoryItem(income.getAmount(),
+                                income.getCategory(),income.getDescription(),
+                                income.getTimestamp(),true));
+                    }
+
+                }
+            }
+            else if(income.getCategory().equals(category)&&(income.getTimestamp()>=fromUnixTime||income.getTimestamp()<=toUnixTime)){
                 if(income.getAmount()>=minamount||income.getAmount()<=maxamount){
 
                     historyItems.add(new HistoryItem(income.getAmount(),
@@ -337,12 +393,24 @@ public class User {
             }
         }
         for(Expenditure expense:expenditures){
-            if(expense.getCategory().equals(category)&&(expense.getTimestamp()>=fromUnixTime||expense.getTimestamp()<=toUnixTime)){
+            if(expense.getCategory().equals("None selected")){
+                if(expense.getTimestamp()>=fromUnixTime||expense.getTimestamp()<=toUnixTime){
+
+                    if(expense.getAmount()>=minamount||expense.getAmount()<=maxamount){
+
+                        historyItems.add(new HistoryItem(expense.getAmount(),
+                                expense.getCategory(),expense.getDescription(),
+                                expense.getTimestamp(),true));
+                    }
+                }
+
+            }
+            else if(expense.getCategory().equals(category)&&(expense.getTimestamp()>=fromUnixTime||expense.getTimestamp()<=toUnixTime)){
                 if(expense.getAmount()>=minamount||expense.getAmount()<=maxamount){
 
                     historyItems.add(new HistoryItem(expense.getAmount(),
                             expense.getCategory(),expense.getDescription(),
-                            expense.getTimestamp(),false));
+                            expense.getTimestamp(),true));
                 }
             }
         }
@@ -350,4 +418,5 @@ public class User {
         Collections.sort(historyItems,new CompDat());
         return historyItems;
     }
+
 }

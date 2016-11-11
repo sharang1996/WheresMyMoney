@@ -21,15 +21,6 @@
         android:orientation="horizontal"
         android:background="@drawable/greenticker">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-"
-            android:id="@+id/sign"
-            android:textColor="#ffffff"
-            android:layout_gravity="center"
-            android:visibility="invisible"/>
-
         <com.robinhood.ticker.TickerView
             android:id="@+id/tickerView"
             android:text="9999"
@@ -44,14 +35,104 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ll"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <Spinner
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:padding="10dip"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:prompt="Enter Category">
+            android:layout_gravity="center">
 
-        </Spinner>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:text="Category:"
+                android:textColor="#ffffff"
+                android:textSize="20sp"
+                android:layout_marginBottom="5dp"/>
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="8dp"
+                />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:padding="2dip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:text="From Date:"
+                android:textSize="20sp"
+                android:layout_marginBottom="5dp"
+                android:onClick="showFromDatePickerDialog"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:text="To Date:"
+                android:textSize="20sp"
+                android:onClick="showToDatePickerDialog"
+                android:layout_marginLeft="25dp"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="2dip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <!-- Min. Amt Label -->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
+                android:textColorHint="@android:color/white">
+                <EditText android:id="@+id/input_minamt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="Enter Min. amount to search from :"
+                    android:textColor="@android:color/white"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <!-- Max Amt Label -->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="8dp"
+                app:passwordToggleTint="#ffffff"
+                android:textColorHint="@android:color/white">
+                <EditText android:id="@+id/input_maxamt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="Enter Max. amount to search from :"
+                    android:textColor="@android:color/white"/>
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+
 
     </LinearLayout>
 

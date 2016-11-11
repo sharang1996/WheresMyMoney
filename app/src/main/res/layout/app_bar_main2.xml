@@ -25,10 +25,23 @@
 
     <RelativeLayout
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_gravity="start|bottom">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/coin"
+            android:id="@+id/assistant"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/fab_margin"
         android:layout_gravity="end|bottom" >
-
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_main"
