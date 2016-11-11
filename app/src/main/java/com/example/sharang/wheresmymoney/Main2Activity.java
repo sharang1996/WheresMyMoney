@@ -5,19 +5,20 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -27,28 +28,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.robinhood.ticker.TickerUtils;
+import com.robinhood.ticker.TickerView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,30 +67,24 @@ public class Main2Activity extends AppCompatActivity
     User user;
     private Income newIncome;
     private Expenditure newExpenditure;
-    TextView tv,navname,navemail;
+    TextView sign,navname,navemail;
     ImageView profilePicture;
     private String userChoosenTask;
     private String strBase64;
     NavigationView navigationView;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
-
-    //Done : add profile picture from camera intent or local storage...
+    FirebaseUser fuser;
+    ProfilePictureAdd adder;
+    LinearLayout ll;
+    TickerView tickerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        //Date date = new Date(System.currentTimeMillis());
-        //Log.i("#####",DateFormat.getDateInstance(DateFormat.LONG).format(date));
-
-        DateFormat df = new SimpleDateFormat("yyyy/MM/dd kk:mm:ss");
-        Calendar c    = Calendar.getInstance();
-        Date day      = c.getTime();
-        String s2     = df.format(day);
-
-        Log.i("#####",s2);
+        fuser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (!calledAlready)
         {
@@ -96,14 +92,26 @@ public class Main2Activity extends AppCompatActivity
             calledAlready = true;
         }
 
-        tv = (TextView)findViewById(R.id.textView);
+        ll = (LinearLayout)findViewById(R.id.ll);
+
+        tickerView =(TickerView) findViewById(R.id.tickerView);
+        tickerView.setCharacterList(TickerUtils.getDefaultNumberList());
+
+        tickerView.setText("0000");
+        tickerView.setTextColor(Color.WHITE);
+        tickerView.setTextSize(300);
+
+        tickerView.setAnimationDuration(500);
+        tickerView.setAnimationInterpolator(new OvershootInterpolator());
+        tickerView.setGravity(Gravity.START);
+
+        sign = (TextView)findViewById(R.id.sign);
+        sign.setTextSize(300);
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         View headerView = navigationView.getHeaderView(0);
-
-
 
         profilePicture = (de.hdodenhof.circleimageview.CircleImageView)headerView.findViewById(R.id.profile_image);
         navemail =(TextView) headerView.findViewById(R.id.email);
@@ -112,11 +120,12 @@ public class Main2Activity extends AppCompatActivity
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String encodedBitmap = preferences.getString("encodedBitmap","nosavedimage");
         if(encodedBitmap.equals("nosavedimage"))
-            profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.nopp));
+            profilePicture.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.nopp));
         else{
             byte[] imageAsBytes = Base64.decode(encodedBitmap.getBytes(),Base64.DEFAULT);
             profilePicture.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
         }
+
         profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,16 +144,28 @@ public class Main2Activity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {
+
                     user = messageSnapshot.getValue(User.class);
                     uid = user.getUid();
+
                     user.calculateBalance();
-                    tv.setText(user.getBalance()+"");
-                    tv.setTextSize(40);
-                    if(user.getBalance()>0)
-                        tv.setTextColor(Color.GREEN);
+
+                    tickerView.setText("" + (int) Math.abs(Math.floor(user.getBalance())));
+                    tickerView.setTextSize(300);
+
+                    if(user.getBalance() >= 0)
+                    {
+                        ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.greenticker));
+                        sign.setVisibility(View.INVISIBLE);
+                    }
+
                     else
-                    if(user.getBalance()<0)
-                        tv.setTextColor(Color.RED);
+                    if(user.getBalance() < 0)
+                    {
+                        ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.redticker));
+                        sign.setVisibility(View.VISIBLE);
+                    }
+
                     navname.setText(user.getName());
                     navemail.setText(user.getEmail());
                 }
@@ -152,7 +173,7 @@ public class Main2Activity extends AppCompatActivity
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                    Toast.makeText(Main2Activity.this, R.string.dberror,Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -181,12 +202,28 @@ public class Main2Activity extends AppCompatActivity
         fab_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addIncomeDialog();
-                user.calculateBalance();
-                tv.setText(user.getBalance()+"");
-                // DONE: 20/10/16  update the firebase database
 
-                Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
+                addIncomeDialog();
+
+                user.calculateBalance();
+
+                if(user.getBalance() >= 0)
+                {
+                    ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.greenticker));
+                    sign.setVisibility(View.INVISIBLE);
+                }
+
+                else
+                if(user.getBalance() < 0)
+                {
+                    ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.redticker));
+                    sign.setVisibility(View.VISIBLE);
+                }
+
+                tickerView.setText("" + (int) Math.abs(Math.floor(user.getBalance())));
+                tickerView.setTextSize(300);
+
+                Map usermap = new ObjectMapper().convertValue(user, Map.class);
                 Map<String, Object> childUpdates = new HashMap<>();
                 childUpdates.put(uid,usermap);
 
@@ -199,10 +236,24 @@ public class Main2Activity extends AppCompatActivity
             public void onClick(View v) {
                 addExpenditureDialog();
                 user.calculateBalance();
-                tv.setText(user.getBalance()+"");
-                // DONE: 20/10/16  update the firebase database
 
-                Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
+                if(user.getBalance() >= 0)
+                {
+                    ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.greenticker));
+                    sign.setVisibility(View.INVISIBLE);
+                }
+
+                else
+                if(user.getBalance() < 0)
+                {
+                    ll.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.redticker));
+                    sign.setVisibility(View.VISIBLE);
+                }
+
+                tickerView.setText("" + (int) Math.abs(Math.floor(user.getBalance())));
+                tickerView.setTextSize(300);
+
+                Map usermap = new ObjectMapper().convertValue(user, Map.class);
                 Map<String, Object> childUpdates = new HashMap<>();
                 childUpdates.put(uid,usermap);
 
@@ -254,7 +305,7 @@ public class Main2Activity extends AppCompatActivity
 
             user.addIncome(newIncome);
 
-            Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
+            Map usermap = new ObjectMapper().convertValue(user, Map.class);
             Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put(uid, usermap);
 
@@ -286,18 +337,23 @@ public class Main2Activity extends AppCompatActivity
 
             user.addExpenditure(newExpenditure);
 
-            Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
+            Map usermap = new ObjectMapper().convertValue(user, Map.class);
             Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put(uid, usermap);
+
             rootref.child("user").updateChildren(childUpdates);
+
             Toast.makeText(Main2Activity.this, description + " " + amount, Toast.LENGTH_SHORT).show();
         }
 
         if (resultCode == Activity.RESULT_OK) {
+
+            adder = new ProfilePictureAdd(getApplicationContext().getContentResolver(),Main2Activity.this,editor,prefs,strBase64);
+
             if (requestCode == SELECT_FILE)
-                onSelectFromGalleryResult(data);
+                profilePicture.setImageBitmap(adder.onSelectFromGalleryResult(data));
             else if (requestCode == REQUEST_CAMERA)
-                onCaptureImageResult(data);
+                profilePicture.setImageBitmap(adder.onCaptureImageResult(data));
 
         }
     }
@@ -328,6 +384,10 @@ public class Main2Activity extends AppCompatActivity
 
         if (id == R.id.action_logout) {
             FirebaseAuth.getInstance().signOut();
+            if(adder!=null)
+            {
+                adder.clearPrefs();
+            }
             startActivity(new Intent(Main2Activity.this,SignIn.class));
         }
 
@@ -336,7 +396,7 @@ public class Main2Activity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -346,21 +406,26 @@ public class Main2Activity extends AppCompatActivity
             i.putExtra("email",user.getEmail());
             i.putExtra("password",user.getPassword());
             //i.putExtra("profilepic",PreferenceManager.getDefaultSharedPreferences(this).getString("encodedBitmap","nosavedimage"));
-            i.putExtra("name",user.getName());
             startActivity(i);
         }
         if (id == R.id.history) {
 
 
-            Intent  i = new Intent(Main2Activity.this,History.class);
+            if(user.getChronologicalEvent()==null){
+                Toast.makeText(Main2Activity.this,"No Transactions available",Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Intent  i = new Intent(Main2Activity.this,History.class);
 
-            Bundle information = new Bundle();
-            Log.i("#####","main2activity : "+user.getChronologicalEvent().toString());
-            information.putSerializable("historyitem", user.getChronologicalEvent());
-            i.putExtras(information);
-            i.putExtra("email",email);
+                Bundle information = new Bundle();
+                Log.i("#####","main2activity : "+user.getChronologicalEvent().toString());
+                information.putSerializable("historyitem", user.getChronologicalEvent());
+                i.putExtras(information);
+                i.putExtra("email",email);
 
-            startActivity(i);
+                startActivity(i);
+            }
+
             /*for(HistoryItem historyItem : historyItems)
             {
              Log.i("blahhh","   "+historyItem.toString());
@@ -412,11 +477,17 @@ public class Main2Activity extends AppCompatActivity
             startActivity(i);
 
         } else if (id == R.id.nav_share) {
-            StringBuilder sb = composeString(user.getChronologicalEvent());
-            Intent i = new Intent(Main2Activity.this,Share.class);
-            i.putExtra("transactions",sb.toString());
-            i.putExtra("name",user.getName());
-            startActivity(i);
+
+            if(user.getChronologicalEvent()==null){
+                Toast.makeText(Main2Activity.this,"No Transactions available to share",Toast.LENGTH_SHORT).show();
+            }
+            else{
+                StringBuilder sb = composeString(user.getChronologicalEvent());
+                Intent i = new Intent(Main2Activity.this,Share.class);
+                i.putExtra("transactions",sb.toString());
+                i.putExtra("name",user.getName());
+                startActivity(i);
+            }
 
         }else if (id == R.id.nav_about) {
             Intent  i = new Intent(Main2Activity.this,AboutUs.class);
@@ -482,7 +553,7 @@ public class Main2Activity extends AppCompatActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -492,7 +563,7 @@ public class Main2Activity extends AppCompatActivity
                         galleryIntent();
                 } else {
                     //code for deny
-                    profilePicture.setImageDrawable(getResources().getDrawable(R.drawable.nopp));
+                    profilePicture.setImageDrawable(ContextCompat.getDrawable(Main2Activity.this, R.drawable.nopp));
                 }
                 break;
         }

@@ -3,11 +3,19 @@ package com.example.sharang.wheresmymoney;
 import com.google.firebase.database.Exclude;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 
 /**
  * Created by sharang on 15/9/16.
  */
 
+class CompDat implements Comparator<HistoryItem> {
+    public int compare(HistoryItem expdate1,HistoryItem expdate2){
+        return Long.valueOf(expdate1.getTimestamp()).compareTo(Long.valueOf(expdate2.getTimestamp()));
+    }
+}
 public class User {
 
     private String uid;
@@ -306,5 +314,40 @@ public class User {
             sum += expenditure.getAmount();
         }
         return ""+sum;
+    }
+
+    public ArrayList<HistoryItem> getTransactions(String category, int fdate, int fmonth, int fyear, int tdate, int tmonth, int tyear, double minamount, double maxamount){
+        int i=0,j=0;
+        ArrayList<HistoryItem> historyItems=new ArrayList<>();
+
+        Date fromdate=new Date(fyear,fmonth,fdate);
+        Date todate=new Date(tyear,tmonth,tdate);
+
+        long fromUnixTime = (long) fromdate.getTime()/1000;
+        long toUnixTime = (long) todate.getTime()/1000;
+
+        for(Income income:incomes){
+            if(income.getCategory().equals(category)&&(income.getTimestamp()>=fromUnixTime||income.getTimestamp()<=toUnixTime)){
+                if(income.getAmount()>=minamount||income.getAmount()<=maxamount){
+
+                    historyItems.add(new HistoryItem(income.getAmount(),
+                            income.getCategory(),income.getDescription(),
+                            income.getTimestamp(),true));
+                }
+            }
+        }
+        for(Expenditure expense:expenditures){
+            if(expense.getCategory().equals(category)&&(expense.getTimestamp()>=fromUnixTime||expense.getTimestamp()<=toUnixTime)){
+                if(expense.getAmount()>=minamount||expense.getAmount()<=maxamount){
+
+                    historyItems.add(new HistoryItem(expense.getAmount(),
+                            expense.getCategory(),expense.getDescription(),
+                            expense.getTimestamp(),false));
+                }
+            }
+        }
+
+        Collections.sort(historyItems,new CompDat());
+        return historyItems;
     }
 }

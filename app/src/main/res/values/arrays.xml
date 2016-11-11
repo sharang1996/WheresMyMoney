@@ -15,9 +15,9 @@
 
     <string-array name="income_icons">
         <item>@drawable/fincome</item>
-        <item>@drawable/gambling</item>
+        <item>@drawable/other</item>
         <item>@drawable/oddjobs</item>
-        <item>@drawable/personal</item>
+        <item>@drawable/other</item>
         <item>@drawable/pension</item>
         <item>@drawable/rent</item>
         <item>@drawable/salary</item>
@@ -55,7 +55,7 @@
     <string-array name="expenditure_icons">
         <item>@drawable/accomodation</item>
         <item>@drawable/bar</item>
-        <item>@drawable/book</item>
+        <item>@drawable/other</item>
         <item>@drawable/car</item>
         <item>@drawable/children</item>
         <item>@drawable/cigarettes</item>
@@ -64,7 +64,7 @@
         <item>@drawable/entertainment</item>
         <item>@drawable/family</item>
         <item>@drawable/fuel</item>
-        <item>@drawable/gambling</item>
+        <item>@drawable/other</item>
         <item>@drawable/gifts</item>
         <item>@drawable/health</item>
         <item>@drawable/home</item>

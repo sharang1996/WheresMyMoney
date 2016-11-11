@@ -2,6 +2,7 @@ package com.example.sharang.wheresmymoney;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +59,7 @@ public class HistoryCustomAdapter extends ArrayAdapter {
         Holder holder;
         if (convertView == null) {
             holder = new Holder();
-            LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = vi.inflate(R.layout.history_item, parent, false);
 
             holder.tvCat = (TextView)convertView.findViewById(R.id.tv_category);
@@ -70,18 +71,8 @@ public class HistoryCustomAdapter extends ArrayAdapter {
         }
 
         holder=(Holder)convertView.getTag();
-        //Holder holder = new Holder();
-        //View rowView;
-        HistoryItem historyItem;
-        //rowView=inflater.inflate(R.layout.history_item,null);
 
-        historyItem = historyItems.get(position);
-
-        /*holder.tvCat = (TextView)rowView.findViewById(R.id.tv_category);
-        holder.tvAmt = (TextView)rowView.findViewById(R.id.tv_amount);
-        holder.tvDate = (TextView)rowView.findViewById(R.id.tv_date);
-        holder.img = (ImageView)rowView.findViewById(R.id.iv);*/
-
+        HistoryItem historyItem = historyItems.get(position);
 
         holder.tvCat.setText(historyItem.getCategory());
         holder.tvAmt.setText(historyItem.getAmount()+"");
@@ -99,13 +90,6 @@ public class HistoryCustomAdapter extends ArrayAdapter {
         holder.img.setImageResource(resID);
 
         return convertView;
-    }
-
-    public void refresh(ArrayList<HistoryItem> historyItems)
-    {
-        this.historyItems.clear();
-        this.historyItems.addAll(historyItems);
-        //notifyDataSetChanged();
     }
 
     public class Holder

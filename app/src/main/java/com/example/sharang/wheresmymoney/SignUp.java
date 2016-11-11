@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +30,7 @@ public class SignUp extends AppCompatActivity {
     EditText name,email,password;
     Button submit,signin;
     DatabaseReference rootref;
+    pl.tajchert.sample.DotsTextView loading;
     //static boolean calledAlready = false;
 
     @Override
@@ -50,43 +52,55 @@ public class SignUp extends AppCompatActivity {
         password = (EditText)findViewById(R.id.input_password);
         submit = (Button)findViewById(R.id.btn_signup);
         signin = (Button)findViewById(R.id.loginredirect);
+        loading = (pl.tajchert.sample.DotsTextView)findViewById(R.id.dots);
+
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                mAuth.createUserWithEmailAndPassword(email.getText().toString(),password.getText().toString())
-                        .addOnCompleteListener(SignUp.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                if(TextUtils.isEmpty(email.getText().toString()) || TextUtils.isEmpty(password.getText().toString()))
+                {
+                    Toast.makeText(SignUp.this, R.string.coaxsignup,Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    loading.showAndPlay();
 
-                        if(task.isSuccessful()){
+                    mAuth.createUserWithEmailAndPassword(email.getText().toString(),password.getText().toString())
+                            .addOnCompleteListener(SignUp.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
 
-                            final User newUser = new User();
+                                    if(task.isSuccessful()){
 
-                            newUser.setEmail(email.getText().toString());
-                            newUser.setName(name.getText().toString());
-                            newUser.setPassword(password.getText().toString());
+                                        final User newUser = new User();
 
-                            String key = rootref.child("user").push().getKey();
-                            newUser.setUid(key);
+                                        newUser.setEmail(email.getText().toString());
+                                        newUser.setName(name.getText().toString());
+                                        newUser.setPassword(password.getText().toString());
 
-                            Map<String, Object> usermap = new ObjectMapper().convertValue(newUser, Map.class);
-                            Map<String, Object> childUpdates = new HashMap<>();
-                            childUpdates.put(key,usermap);
+                                        String key = rootref.child("user").push().getKey();
+                                        newUser.setUid(key);
 
-                            rootref.child("user").updateChildren(childUpdates);
+                                        Map usermap = new ObjectMapper().convertValue(newUser, Map.class);
+                                        Map<String, Object> childUpdates = new HashMap<>();
+                                        childUpdates.put(key,usermap);
 
-                            Intent i = new Intent(SignUp.this,SignIn.class);
-                            startActivity(i);
-                        }
-                        else {
-                            Toast.makeText(SignUp.this, "please enter a valid email id and a password of atleast 6 characters",
-                                    Toast.LENGTH_SHORT).show();
-                        }
+                                        rootref.child("user").updateChildren(childUpdates);
+
+                                        Intent i = new Intent(SignUp.this,SignIn.class);
+                                        startActivity(i);
+                                        finish();
+                                    }
+                                    else {
+                                        Toast.makeText(SignUp.this, R.string.failedsignin,
+                                                Toast.LENGTH_SHORT).show();
+                                    }
 
 
-                    }
-                });
+                                }
+                            });
+                }
 
             }
         });
@@ -96,6 +110,7 @@ public class SignUp extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i  = new Intent(SignUp.this,SignIn.class);
                 startActivity(i);
+                finish();
             }
         });
     }

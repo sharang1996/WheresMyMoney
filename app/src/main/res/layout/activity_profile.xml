@@ -1,62 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_profile"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.sharang.wheresmymoney.Profile">
+    android:background="#000000"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/nopp"
-        android:layout_marginTop="44dp"
-        android:id="@+id/profileiv"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+    <com.github.florent37.diagonallayout.DiagonalLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:elevation="10dp"
+        app:diagonal_angle="20"
+        app:diagonal_gravity="left|bottom">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/pbackground" />
+
+    </com.github.florent37.diagonallayout.DiagonalLayout>
 
     <TextView
-        android:text="name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/profileiv"
-        android:layout_centerHorizontal="true"
+        android:text="SHARANG GUPTA"
+        android:id="@+id/name"
+        android:layout_marginTop="20dp"
+        android:textSize="30sp"
+        android:elevation="15dp"
+        android:textColor="#ffffff"
+        android:maxLines="1"
+        android:ellipsize="end"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="sharang.gupta@sitpune.edu.in"
+        android:id="@+id/email"
         android:layout_marginTop="60dp"
-        android:id="@+id/tvname" />
+        android:textSize="13sp"
+        android:elevation="15dp"
+        android:textColor="#ffffff"
+        />
 
-    <TextView
-        android:text="Email"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvname"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="37dp"
-        android:id="@+id/tvemail" />
+        android:orientation="horizontal"
+        android:layout_marginTop="250dp">
 
-    <EditText
-        android:text="password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvpassword"
-        android:layout_alignBaseline="@+id/bchangepassword"
-        android:layout_alignBottom="@+id/bchangepassword"
-        android:layout_toLeftOf="@+id/tvemail"
-        android:layout_toStartOf="@+id/tvemail" />
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:passwordToggleTint="#ffffff"
+            android:textColorHint="@android:color/white">
+            <EditText android:id="@+id/profile_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:hint="Password"
+                app:passwordToggleDrawable="@drawable/ic_visible"
+                android:textColor="@android:color/white"/>
+        </android.support.design.widget.TextInputLayout>
 
-    <Button
-        android:text="Change Password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="21dp"
-        android:id="@+id/bchangepassword"
-        android:layout_below="@+id/tvemail"
-        android:layout_toRightOf="@+id/tvpassword"
-        android:layout_toEndOf="@+id/tvpassword" />
-</RelativeLayout>
+        <com.dd.morphingbutton.MorphingButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bchangepassword"
+            android:background="#0710b9"
+            android:layout_marginLeft="15dp"
+            android:text="Change"
+            android:textColor="#ffffff">
+        </com.dd.morphingbutton.MorphingButton>
+
+    </LinearLayout>
+
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/profile_image"
+        android:layout_marginTop="140dp"
+        android:elevation="15dp"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:src="@drawable/nopp"
+        android:clickable="true"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FF000000"/>
+
+    <com.github.florent37.diagonallayout.DiagonalLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_gravity="bottom"
+        android:gravity="right"
+        android:elevation="10dp"
+        app:diagonal_angle="20"
+        app:diagonal_gravity="right|top">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/pbackground" />
+
+    </com.github.florent37.diagonallayout.DiagonalLayout>
+
+</FrameLayout>

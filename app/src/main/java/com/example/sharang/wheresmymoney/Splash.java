@@ -30,6 +30,10 @@ public class Splash extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        getSupportActionBar().hide();
+
         setContentView(R.layout.splash);
 
         mAuth = FirebaseAuth.getInstance();
@@ -51,7 +55,7 @@ public class Splash extends AppCompatActivity {
                             startActivity(i);
                             finish();
                         }
-                    }, 5000);
+                    }, 3000);
                 } else
                 {
                     // User is signed out
@@ -62,7 +66,7 @@ public class Splash extends AppCompatActivity {
                             startActivity(i);
                             finish();
                         }
-                    }, 5000);
+                    }, 3000);
                 }
 
             }

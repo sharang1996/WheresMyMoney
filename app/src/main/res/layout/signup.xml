@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#081463"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:dots="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/appback"
     android:fitsSystemWindows="true">
 
     <LinearLayout
@@ -14,10 +15,11 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp">
 
-        <ImageView android:src="@drawable/appicon"
+        <ImageView android:src="@drawable/appic"
             android:layout_width="wrap_content"
+            android:contentDescription="@string/application_icon"
             android:layout_height="72dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="15dp"
             android:layout_gravity="center_horizontal" />
 
         <!--  Name Label -->
@@ -32,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textCapWords"
                 android:textColor="@android:color/white"
-                android:hint="Name" />
+                android:hint="@string/name" />
         </android.support.design.widget.TextInputLayout>
 
         <!-- Email Label -->
@@ -47,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 android:textColor="@android:color/white"
-                android:hint="Email" />
+                android:hint="@string/email" />
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password Label -->
@@ -56,13 +58,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
+            app:passwordToggleTint="#ffffff"
             android:textColorHint="@android:color/white">
             <EditText android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:textColor="@android:color/white"
-                android:hint="Password"/>
+                android:hint="@string/password"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Signup Button -->
@@ -70,10 +73,12 @@
             android:id="@+id/btn_signup"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
             android:padding="12dp"
-            android:text="Create Account"/>
+            android:background="#319300"
+            android:textColor="@android:color/white"
+            android:text="@string/create_account"/>
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -84,24 +89,36 @@
             <TextView android:id="@+id/link_login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Already a member?"
-                android:layout_marginStart="70dp"
-                android:layout_marginLeft="70dp"
+                android:text="@string/already_a_member"
+                android:layout_marginStart="30dp"
+                android:layout_marginLeft="30dp"
                 android:textColor="#ffffff"
                 android:layout_gravity="center"
-                android:textSize="16dip"/>
+                android:textSize="20sp"/>
 
             <Button
                 android:id="@+id/loginredirect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:background="#081463"
-                android:text="Login"
+                android:text="@string/login"
+                android:layout_marginStart="30dp"
+                android:layout_marginLeft="30dp"
+                android:background="#319300"
                 android:textColor="@android:color/white"/>
 
         </LinearLayout>
 
+        <pl.tajchert.sample.DotsTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dots"
+            android:textSize="60sp"
+            android:textColor="@android:color/white"
+            dots:autoplay="false"
+            android:layout_marginStart="140dp"
+            android:layout_marginLeft="140dp"
+            dots:period="1000"/>
 
     </LinearLayout>
 </ScrollView>

@@ -9,18 +9,50 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@drawable/appback"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.sharang.wheresmymoney.Main2Activity"
     tools:showIn="@layout/app_bar_main2">
 
-    <TextView
-        android:text="0.0"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="80sp"
-        android:layout_marginTop="18dp"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_height="150dp"
+        android:id="@+id/ll"
+        android:orientation="horizontal"
+        android:background="@drawable/greenticker">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:id="@+id/sign"
+            android:textColor="#ffffff"
+            android:layout_gravity="center"
+            android:visibility="invisible"/>
+
+        <com.robinhood.ticker.TickerView
+            android:id="@+id/tickerView"
+            android:text="9999"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:prompt="Enter Category">
+
+        </Spinner>
+
+    </LinearLayout>
 
 </RelativeLayout>

@@ -2,8 +2,10 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:dots="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
-    android:background="#081463">
+    android:background="@drawable/appback">
 
     <LinearLayout
         android:orientation="vertical"
@@ -13,7 +15,8 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp">
 
-        <ImageView android:src="@drawable/appicon"
+        <ImageView android:src="@drawable/appic"
+            android:contentDescription="@string/application_icon"
             android:layout_width="wrap_content"
             android:layout_height="72dp"
             android:layout_marginBottom="24dp"
@@ -30,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                android:hint="Email"
+                android:hint="@string/email"
                 android:textColor="@android:color/white"/>
         </android.support.design.widget.TextInputLayout>
 
@@ -40,12 +43,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
+            app:passwordToggleTint="#ffffff"
             android:textColorHint="@android:color/white">
             <EditText android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
-                android:hint="Password"
+                android:hint="@string/password"
                 android:textColor="@android:color/white"/>
         </android.support.design.widget.TextInputLayout>
 
@@ -56,7 +60,9 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
             android:padding="12dp"
-            android:text="Login"/>
+            android:background="#319300"
+            android:textColor="@android:color/white"
+            android:text="@string/login"/>
 
 
         <LinearLayout
@@ -68,23 +74,38 @@
             <TextView android:id="@+id/link_signup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="No account yet?"
+                android:text="@string/no_account_yet"
                 android:textColor="@android:color/white"
                 android:gravity="center"
-                android:layout_marginStart="70dp"
-                android:layout_marginLeft="70dp"
-                android:textSize="16dip"/>
+                android:layout_marginStart="40dp"
+                android:layout_marginLeft="40dp"
+                android:textSize="20sp"/>
 
             <Button
                 android:id="@+id/signupredirect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:background="#081463"
-                android:text="Signup"
-                android:textColor="@android:color/white"/>
+                android:text="@string/signup"
+                android:background="#319300"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="30dp"
+                android:layout_marginLeft="30dp"
+                />
 
         </LinearLayout>
 
+
+        <pl.tajchert.sample.DotsTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dots"
+            android:textSize="60sp"
+            android:textColor="@android:color/white"
+            dots:autoplay="false"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="140dp"
+            android:layout_marginLeft="140dp"
+            dots:period="1000"/>
     </LinearLayout>
 </ScrollView>

@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
@@ -38,16 +41,19 @@ public class History extends AppCompatActivity {
     User user;
     HistoryItem h;
     int position;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        getSupportActionBar().hide();
+
         setContentView(R.layout.activity_history);
 
-        context=this;
+        context=History.this;
         historyItems = (ArrayList<HistoryItem>) getIntent().getSerializableExtra("historyitem");
-        Log.i("#####","History : "+historyItems.toString());
         email = getIntent().getStringExtra("email");
-
         rootref = FirebaseDatabase.getInstance().getReference();
 
         rootref.child("user").orderByChild("email").equalTo(email).addValueEventListener(new ValueEventListener() {
@@ -99,37 +105,20 @@ public class History extends AppCompatActivity {
             @Override
             public void create(SwipeMenu menu) {
                 // create "open" item
-                SwipeMenuItem openItem = new SwipeMenuItem(
-                        getApplicationContext());
+                SwipeMenuItem openItem = new SwipeMenuItem(getApplicationContext());
                 // set item background
-                openItem.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
-                        0xCE)));
+                openItem.setBackground(new ColorDrawable(Color.argb(265,16,230,194)));
                 // set item width
                 openItem.setWidth(200);
-                // set item title
-
-
-                /*
-
-                openItem.setTitle("Edit");
-                // set item title fontsize
-                openItem.setTitleSize(18);
-                // set item title font color
-                openItem.setTitleColor(Color.WHITE);
-
-                */
-
+                // set item icon
                 openItem.setIcon(R.drawable.ic_edit);
-
                 // add to menu
                 menu.addMenuItem(openItem);
 
                 // create "delete" item
-                SwipeMenuItem deleteItem = new SwipeMenuItem(
-                        getApplicationContext());
+                SwipeMenuItem deleteItem = new SwipeMenuItem(getApplicationContext());
                 // set item background
-                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
-                        0xCE)));
+                openItem.setBackground(new ColorDrawable(Color.argb(265,16,230,194)));
                 // set item width
                 deleteItem.setWidth(200);
                 // set a icon
@@ -139,7 +128,7 @@ public class History extends AppCompatActivity {
             }
         };
 
-// set creator
+        // set creator
         lv.setMenuCreator(creator);
 
         lv.setOnSwipeListener(new SwipeMenuListView.OnSwipeListener() {
@@ -183,7 +172,7 @@ public class History extends AppCompatActivity {
                             user.removeExpenditure(item);
                         }
 
-                        Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
+                        Map usermap = new ObjectMapper().convertValue(user, Map.class);
                         Map<String, Object> childUpdates = new HashMap<>();
                         childUpdates.put(user.getUid(),usermap);
 
@@ -198,11 +187,10 @@ public class History extends AppCompatActivity {
 
     private void editTransaction(int position) {
         h = historyItems.get(position);
-        historyItems.remove(position);
         this.position = position;
 
         Intent i = new Intent(History.this,TransactionEdit.class);
-        Log.i("#####",h.getAmount()+""+h.getDescription());
+
         i.putExtra("Amount",h.getAmount());
         i.putExtra("Description",h.getDescription());
         startActivityForResult(i,5);
@@ -220,21 +208,15 @@ public class History extends AppCompatActivity {
 
             h.setDescription(description);
             h.setAmount(amount);
-            //h.setTimestamp(System.currentTimeMillis());
 
-            //adapter.add(h);
+            historyItems.remove(position);
             historyItems.add(position,h);
-            //adapter.notifyDataSetChanged();
-            //adapter.refresh(historyItems);
-            //adapter.clear();
-            //adapter.addAll(historyItems);
 
             adapter.notifyDataSetChanged();
-            //lv.setAdapter(adapter);
 
             user.makeEdit(h);
 
-            Map<String, Object> usermap = new ObjectMapper().convertValue(user, Map.class);
+            Map usermap = new ObjectMapper().convertValue(user, Map.class);
             Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put(user.getUid(), usermap);
 
